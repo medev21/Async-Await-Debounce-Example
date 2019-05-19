@@ -40,24 +40,26 @@
         }
         
         async function getCuisines(text){
-            const response = await fetch(baseURL + 'cuisines/');
-            const data = await response.json();
-            const suggestions = document.getElementById("suggestions");
-            const ul = document.createElement('ul');
-            suggestions.appendChild(ul);
+            if(text.length > 0){
+                const response = await fetch(baseURL + 'cuisines/');
+                const data = await response.json();
+                const suggestions = document.getElementById("suggestions");
+                const ul = document.createElement('ul');
+                suggestions.appendChild(ul);
 
-            data.forEach(element => {
+                data.forEach(element => {
 
-                //if cuisine contains text characters
-                let match = new RegExp(text);
-                let str = element.toLowerCase();
-                if(match.test(str)){
-                    const li = document.createElement('li');
-                    li.innerText = element;
-                    ul.appendChild(li);
-                }
-                
-            });
+                    //if cuisine contains text characters
+                    let match = new RegExp(text);
+                    let str = element.toLowerCase();
+                    if(match.test(str)){
+                        const li = document.createElement('li');
+                        li.innerText = element;
+                        ul.appendChild(li);
+                    }
+                    
+                });
+            }
         }
 
         const debounce = function(func, wait, immediate) {
@@ -76,6 +78,8 @@
         };
 
         const debounceSearch = debounce(function(event){
+            const suggestions = document.getElementById("suggestions");//get suggestion element
+            suggestions.innerHTML = ''; //clear contents under this element
             const text = event.target.value;
             getCuisines(text);
         }, 300)
