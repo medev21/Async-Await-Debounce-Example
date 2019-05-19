@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async/Await</title>
+    <style>
+        html{
+            width: 100%;
+            height: 100%;
+        }
+
+        body{
+            background-color: #FFF;
+            color: #4E4E4E;
+            margin: 0;
+            font-family: 'Helvetica', sans-serif;
+            height: 100%;
+            font-size: 24px;
+        }
+
+        ul {margin: 0; list-style: none; padding: 0;}
+
+        li{ margin: 0;}
+
+        #container{height: inherit;}
+        
+    </style>
+</head>
+<body>
+    <div id="container">
+        <input id="inputSearch" placeholder="search a cuisine" />
+        <div id="suggestions"></div>
+    </div>
+    <script>
+        const baseURL = 'https://inspection-grade-server.herokuapp.com/api/';
+
+        const init = function(){
+            document.getElementById("inputSearch").addEventListener('input', debounceSearch)
+        }
+        
+        async function getCuisines(text){
+            const response = await fetch(baseURL + 'cuisines/');
+            const data = await response.json();
+            const suggestions = document.getElementById("suggestions");
+            const ul = document.createElement('ul');
+            suggestions.appendChild(ul);
+
+            data.forEach(element => {
+
+                //if cuisine contains text characters
+                let match = new RegExp(text);
+                let str = element.toLowerCase();
+                if(match.test(str)){
+                    const li = document.createElement('li');
+                    li.innerText = element;
+                    ul.appendChild(li);
+                }
+                
+            });
+        }
+
+        const debounce = function(func, wait, immediate) {
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                var callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
+
+        const debounceSearch = debounce(function(event){
+            const text = event.target.value;
+            getCuisines(text);
+        }, 300)
+
+        init();
+
+    </script>
+</body>
+</html>
